@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  app:
+    build: .
+    container_name: redis-pubsub-api
+    restart: always
+    volumes:
+      - .:/usr/app
+    ports:
+      - "${API_SUBSCRIBER_PORT}:${API_SUBSCRIBER_PORT}"
+      - "${API_PUBLISHER_PORT}:${API_PUBLISHER_PORT}"
+
+    networks:
+      - pubsub-net
+
+  redis:
+    image: redis:alpine
+    container_name: redis-pubsub-db
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    ports:
+      - "${REDIS_EXTERNAL_PORT}:${REDIS_PORT}"
+    networks:
+      - pubsub-net
+
+networks:
+  pubsub-net:
+    driver: bridge
